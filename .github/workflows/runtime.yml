@@ -1,0 +1,128 @@
+name: Native runtime proof
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  MESENCE_REVISION: 056d393916aa9d1155511b0297a04c6685ca93f3
+
+jobs:
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: nesport
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: SomeoneIsWorking/MesenCE
+          ref: ${{ env.MESENCE_REVISION }}
+          path: mesence
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          version: 0.8.17
+          enable-cache: false
+      - name: Install pinned build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang-18 clang-format-18 clang-tidy-18 cmake ninja-build libsdl2-dev
+      - name: Execute asset-free runtime gate
+        working-directory: nesport
+        env:
+          CC: clang-18
+          CXX: clang++-18
+          CLANG_FORMAT: clang-format-18
+          CLANG_TIDY: clang-tidy-18
+          MESENCE_SOURCE_DIR: ../mesence
+        run: uv run --frozen python tools/verify.py --jobs 4
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: nesport
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: SomeoneIsWorking/MesenCE
+          ref: ${{ env.MESENCE_REVISION }}
+          path: mesence
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          version: 0.8.17
+          enable-cache: false
+      - name: Select pinned Apple toolchain
+        run: sudo xcode-select --switch /Applications/Xcode_16.4.app
+      - name: Install build dependencies
+        run: |
+          brew install llvm ninja sdl2
+          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+      - name: Execute asset-free runtime gate
+        working-directory: nesport
+        env:
+          CC: clang
+          CXX: clang++
+          MESENCE_SOURCE_DIR: ../mesence
+        run: uv run --frozen python tools/verify.py --jobs 4
+
+  windows:
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: nesport
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: SomeoneIsWorking/MesenCE
+          ref: ${{ env.MESENCE_REVISION }}
+          path: mesence
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
+        with:
+          version: 0.8.17
+          enable-cache: false
+      - name: Pin vcpkg dependency toolchain
+        shell: pwsh
+        run: |
+          git -C $env:VCPKG_INSTALLATION_ROOT fetch https://github.com/microsoft/vcpkg.git 04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4
+          git -C $env:VCPKG_INSTALLATION_ROOT checkout 04a9d8e5212d01ee1dd9478eadd9caade4f8b0d4
+          & "$env:VCPKG_INSTALLATION_ROOT/bootstrap-vcpkg.bat" -disableMetrics
+          & "$env:VCPKG_INSTALLATION_ROOT/vcpkg.exe" install sdl2:x64-windows
+          $toolchain = "$($env:VCPKG_INSTALLATION_ROOT -replace '\\', '/')/scripts/buildsystems/vcpkg.cmake"
+          "CMAKE_TOOLCHAIN_FILE=$toolchain" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Execute asset-free runtime gate
+        shell: pwsh
+        working-directory: nesport
+        env:
+          CC: clang-cl
+          CXX: clang-cl
+          VCPKG_TARGET_TRIPLET: x64-windows
+          MESENCE_SOURCE_DIR: ../mesence
+        run: uv run --frozen python tools/verify.py --jobs 4
