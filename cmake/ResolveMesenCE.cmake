@@ -1,0 +1,32 @@
+include(${CMAKE_CURRENT_LIST_DIR}/MesenCERevision.cmake)
+
+set(MESENCE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../mesence" CACHE PATH "Maintained MesenCE checkout")
+if(NOT EXISTS "${MESENCE_SOURCE_DIR}/Core/NES/Port/NesPortExecution.h")
+	message(FATAL_ERROR "MesenCE port API is missing at ${MESENCE_SOURCE_DIR}; expected maintained revision ${NESPORT_MESENCE_REVISION}")
+endif()
+
+find_package(Git REQUIRED)
+execute_process(
+	COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+	WORKING_DIRECTORY "${MESENCE_SOURCE_DIR}"
+	OUTPUT_VARIABLE MESENCE_ACTUAL_REVISION
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	COMMAND_ERROR_IS_FATAL ANY
+)
+if(NOT MESENCE_ACTUAL_REVISION STREQUAL NESPORT_MESENCE_REVISION)
+	message(FATAL_ERROR "MesenCE revision mismatch: expected ${NESPORT_MESENCE_REVISION}, found ${MESENCE_ACTUAL_REVISION}")
+endif()
+
+execute_process(
+	COMMAND ${GIT_EXECUTABLE} status --porcelain --untracked-files=normal
+	WORKING_DIRECTORY "${MESENCE_SOURCE_DIR}"
+	OUTPUT_VARIABLE MESENCE_CHECKOUT_CHANGES
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	COMMAND_ERROR_IS_FATAL ANY
+)
+if(MESENCE_CHECKOUT_CHANGES)
+	message(FATAL_ERROR "MesenCE checkout is modified or has untracked files; nesport requires exact revision ${NESPORT_MESENCE_REVISION}")
+endif()
+
+set(MESENCE_BUILD_PORT_TESTS OFF CACHE BOOL "" FORCE)
+add_subdirectory("${MESENCE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/mesence" EXCLUDE_FROM_ALL)
