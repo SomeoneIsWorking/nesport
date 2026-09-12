@@ -1,6 +1,7 @@
 #include "nesport/machine.h"
 
 #include <cstdint>
+#include <cstdio>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -100,7 +101,7 @@ int main() {
 		std::cout << "nesport runtime proof: core/original, scoped native, bounded stop, state and logger passed\n";
 		return 0;
 	} catch (const std::exception &error) {
-		std::cout << "nesport runtime proof failed: " << error.what() << '\n';
+		std::fprintf(stderr, "nesport runtime proof failed: %s\n", error.what());
 		return 1;
 	}
 }
