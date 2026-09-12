@@ -41,7 +41,9 @@ class RecordingLogger final : public nesport::ILogger {
   public:
 	std::vector<std::string> Messages;
 
-	void Write(nesport::LogLevel, std::string_view message) override { Messages.emplace_back(message); }
+	void Write(nesport::LogLevel, std::string_view message) override {
+		Messages.emplace_back(message);
+	}
 };
 } // namespace
 
@@ -60,8 +62,9 @@ int main() {
 		}
 		Require(rejectedInvalidConfig, "zero instruction budget was not rejected before runtime creation");
 
-		overrides.Register(
-			{0x8000, "original-entry", "proof", [](nesport::NativeCall &) { return nesport::NativeOverrideAction::RunOriginal; }});
+		overrides.Register({0x8000, "original-entry", "proof", [](nesport::NativeCall &) {
+								return nesport::NativeOverrideAction::RunOriginal;
+							}});
 		overrides.Register({0x8002, "native-store", "proof", [](nesport::NativeCall &call) {
 								NesPortCpuBoundaryState state = call.GetCpuState();
 								const NesPortMemoryCallbacks &memory = call.Memory();
@@ -70,7 +73,9 @@ int main() {
 								call.SetCpuState(state);
 								return nesport::NativeOverrideAction::Handled;
 							}});
-		overrides.Register({0x8005, "bounded-stop", "proof", [](nesport::NativeCall &) { return nesport::NativeOverrideAction::Stop; }});
+		overrides.Register({0x8005, "bounded-stop", "proof", [](nesport::NativeCall &) {
+								return nesport::NativeOverrideAction::Stop;
+							}});
 
 		nesport::RuntimeConfig config;
 		config.InstructionBudget = 16;

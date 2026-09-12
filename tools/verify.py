@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from pathlib import Path
 
 from verification import policy
@@ -16,11 +17,22 @@ def source_files(root: Path) -> list[str]:
     return [str(path.relative_to(root)) for path in sorted(paths)]
 
 
+def cpp_policy_tool(root: Path) -> Path:
+    shared_root = Path(os.environ.get("RE_HARNESS_SOURCE_DIR", root.parent / "re-harness"))
+    tool = shared_root / "tools" / "cpp_policy.py"
+    if not tool.is_file():
+        raise RuntimeError(f"shared C++ policy tool is missing: {tool}")
+    return tool
+
+
 def verify(root: Path, *, jobs: int) -> None:
     policy.check(root)
     sources = source_files(root)
+    cpp_sources = [source for source in sources if Path(source).suffix in {".cc", ".cpp", ".cxx"}]
+    shared_policy = cpp_policy_tool(root)
     clang_format = os.environ.get("CLANG_FORMAT", "clang-format")
     clang_tidy = os.environ.get("CLANG_TIDY", "clang-tidy")
+    run([sys.executable, str(shared_policy), "--audit-config", str(root)], root=root)
     run([clang_format, "--dry-run", "--Werror", *sources], root=root)
 
     build = root / "build" / "verify"
@@ -46,7 +58,11 @@ def verify(root: Path, *, jobs: int) -> None:
         raise RuntimeError("verification build is not configured with clang++ or clang-cl")
     run(["cmake", "--build", str(build), "--target", "nesport_runtime_test", "-j", str(jobs)], root=root, environment=environment)
     run(["ctest", "--test-dir", str(build), "--output-on-failure"], root=root, environment=environment)
-    run([clang_tidy, "-p", str(build), "src/machine.cpp", "src/native_overrides.cpp"], root=root, environment=environment)
+    run([clang_tidy, "-p", str(build), *cpp_sources], root=root, environment=environment)
+    run([
+        sys.executable, str(shared_policy), "--compile-commands", str(build / "compile_commands.json"),
+        "--root", str(root),
+    ], root=root, environment=environment)
     print("nesport verification passed")
 
 

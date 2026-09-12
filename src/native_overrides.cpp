@@ -13,8 +13,9 @@ void NativeOverrideRegistry::Register(NativeOverride nativeOverride) {
 		throw std::invalid_argument("native override handler must be callable");
 	}
 	auto &entries = _byAddress[nativeOverride.GuestAddress];
-	auto duplicate =
-		std::find_if(entries.begin(), entries.end(), [&](const NativeOverride &entry) { return entry.Scope == nativeOverride.Scope; });
+	auto duplicate = std::find_if(entries.begin(), entries.end(), [&](const NativeOverride &entry) {
+		return entry.Scope == nativeOverride.Scope;
+	});
 	if (duplicate != entries.end()) {
 		throw std::invalid_argument("guest address and scope already have a native override");
 	}

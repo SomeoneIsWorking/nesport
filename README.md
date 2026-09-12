@@ -20,7 +20,9 @@ set the CMake cache path `MESENCE_SOURCE_DIR` explicitly.
 ## Verification
 
 Required native packages on Fedora are provided by `clang`, `cmake`, `ninja-build`, and
-`SDL2-devel`. Run:
+`SDL2-devel`; `clang-format` and `clang-tidy` are required for the quality gate. The verifier also
+uses the canonical `cpp_policy.py` from a sibling `shared/re-harness` checkout (or the path named by
+`RE_HARNESS_SOURCE_DIR`). Run:
 
 ```text
 uv run --frozen python tools/verify.py

@@ -1,9 +1,11 @@
-#pragma once
+#ifndef NESPORT_LOGGER_H
+#define NESPORT_LOGGER_H
 
+#include <cstdint>
 #include <string_view>
 
 namespace nesport {
-enum class LogLevel {
+enum class LogLevel : std::uint8_t {
 	Debug,
 	Info,
 	Warning,
@@ -18,6 +20,9 @@ class ILogger {
 
 class NullLogger final : public ILogger {
   public:
-	void Write(LogLevel, std::string_view) override {}
+	void Write(LogLevel, std::string_view) override {
+	}
 };
 } // namespace nesport
+
+#endif // NESPORT_LOGGER_H
