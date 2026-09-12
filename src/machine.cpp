@@ -12,7 +12,8 @@ namespace nesport {
 class Machine::ExecutionHook final : public INesPortInstructionHook {
   public:
 	ExecutionHook(const RuntimeConfig &config, ILogger &logger, const NativeOverrideRegistry &overrides)
-		: _config(config), _logger(logger), _overrides(overrides) {}
+		: _config(config), _logger(logger), _overrides(overrides) {
+	}
 
 	NesPortInstructionAction OnBeforeInstruction(NesPortInstructionContext &context) override {
 		uint16_t programCounter = context.GetCpuState().Cpu.PC;
@@ -41,9 +42,12 @@ class Machine::ExecutionHook final : public INesPortInstructionHook {
 };
 
 Machine::Machine(RuntimeConfig config, ILogger &logger, NativeOverrideRegistry &overrides)
-	: _config(ValidateConfig(std::move(config))), _logger(logger), _overrides(overrides), _emulator(CreateEmulator(_config)) {}
+	: _config(ValidateConfig(std::move(config))), _logger(logger), _overrides(overrides), _emulator(CreateEmulator(_config)) {
+}
 
-Machine::~Machine() { _emulator->Release(); }
+Machine::~Machine() {
+	_emulator->Release();
+}
 
 void Machine::LoadRom(const std::vector<uint8_t> &rom, const std::string &displayName) {
 	if (rom.empty()) {

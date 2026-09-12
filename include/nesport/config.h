@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NESPORT_CONFIG_H
+#define NESPORT_CONFIG_H
 
 #include <cstdint>
 #include <string>
@@ -11,3 +12,5 @@ struct RuntimeConfig final {
 	std::vector<std::string> ActiveOverrideScopes;
 };
 } // namespace nesport
+
+#endif // NESPORT_CONFIG_H

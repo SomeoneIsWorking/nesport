@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NESPORT_MACHINE_H
+#define NESPORT_MACHINE_H
 
 #include "nesport/config.h"
 #include "nesport/logger.h"
@@ -52,3 +53,5 @@ class Machine final {
 	void RequireLoaded() const;
 };
 } // namespace nesport
+
+#endif // NESPORT_MACHINE_H

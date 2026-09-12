@@ -3,3 +3,9 @@ IndentWidth: 4
 TabWidth: 4
 UseTab: Always
 ColumnLimit: 140
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: None
+InsertBraces: true

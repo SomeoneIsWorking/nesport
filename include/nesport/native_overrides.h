@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NESPORT_NATIVE_OVERRIDES_H
+#define NESPORT_NATIVE_OVERRIDES_H
 
 #include "NES/Port/NesPortExecution.h"
 
@@ -10,7 +11,7 @@
 #include <vector>
 
 namespace nesport {
-enum class NativeOverrideAction {
+enum class NativeOverrideAction : std::uint8_t {
 	Handled,
 	RunOriginal,
 	Stop,
@@ -18,11 +19,18 @@ enum class NativeOverrideAction {
 
 class NativeCall final {
   public:
-	explicit NativeCall(NesPortInstructionContext &context) : _context(context) {}
+	explicit NativeCall(NesPortInstructionContext &context) : _context(context) {
+	}
 
-	NesPortCpuBoundaryState GetCpuState() const { return _context.GetCpuState(); }
-	void SetCpuState(const NesPortCpuBoundaryState &state) { _context.SetCpuState(state); }
-	const NesPortMemoryCallbacks &Memory() const { return _context.GetMemoryCallbacks(); }
+	NesPortCpuBoundaryState GetCpuState() const {
+		return _context.GetCpuState();
+	}
+	void SetCpuState(const NesPortCpuBoundaryState &state) {
+		_context.SetCpuState(state);
+	}
+	const NesPortMemoryCallbacks &Memory() const {
+		return _context.GetMemoryCallbacks();
+	}
 
   private:
 	NesPortInstructionContext &_context;
@@ -46,3 +54,5 @@ class NativeOverrideRegistry final {
 	std::unordered_map<uint16_t, std::vector<NativeOverride>> _byAddress;
 };
 } // namespace nesport
+
+#endif // NESPORT_NATIVE_OVERRIDES_H

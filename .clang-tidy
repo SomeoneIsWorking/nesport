@@ -1,12 +1,15 @@
 Checks: >
-  -*,
+  clang-diagnostic-*,
   bugprone-*,
   clang-analyzer-*,
   performance-*,
   portability-*,
+  readability-braces-around-statements,
   readability-container-size-empty,
   readability-duplicate-include,
   readability-inconsistent-declaration-parameter-name
 WarningsAsErrors: '*'
-HeaderFilterRegex: '^(include|src)/'
+HeaderFilterRegex: '^.*[/\\]nesport[/\\](include|src|tests)[/\\]'
 FormatStyle: file
+CheckOptions:
+  readability-braces-around-statements.ShortStatementLines: 0

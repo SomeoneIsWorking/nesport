@@ -10,6 +10,7 @@ permissions:
 
 env:
   MESENCE_REVISION: 056d393916aa9d1155511b0297a04c6685ca93f3
+  RE_HARNESS_REVISION: d626f16b06c091712a40654c567dbc1f1fd1ce48
 
 jobs:
   linux:
@@ -31,6 +32,12 @@ jobs:
           ref: ${{ env.MESENCE_REVISION }}
           path: mesence
           fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: SomeoneIsWorking/re-harness
+          ref: ${{ env.RE_HARNESS_REVISION }}
+          path: re-harness
           persist-credentials: false
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
@@ -70,6 +77,12 @@ jobs:
           path: mesence
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: SomeoneIsWorking/re-harness
+          ref: ${{ env.RE_HARNESS_REVISION }}
+          path: re-harness
+          persist-credentials: false
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
           version: 0.8.17
@@ -103,6 +116,12 @@ jobs:
           ref: ${{ env.MESENCE_REVISION }}
           path: mesence
           fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: SomeoneIsWorking/re-harness
+          ref: ${{ env.RE_HARNESS_REVISION }}
+          path: re-harness
           persist-credentials: false
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
