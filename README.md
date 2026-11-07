@@ -35,3 +35,5 @@ launch. Tests synthesize their own freely generated ROM bytes and no game data i
 
 `nesport` is licensed under GPL-3.0-or-later because it links MesenCE. See `LICENSE` and the pinned
 MesenCE checkout for notices and corresponding source.
+
+Built with AI assistance (Claude and other LLMs).
