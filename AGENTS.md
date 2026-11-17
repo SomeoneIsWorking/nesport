@@ -10,3 +10,5 @@
   original/native/stop transitions and bounded execution accounting.
 - No `run.sh` until a real player target exists.
 - Full verifier: `uv run --frozen python tools/verify.py`.
+
+- Per-operation cost metering is missing and needs building: Lucent `lucent::perf` scopes (`OperationMeter`) reporting the run-end lines of the re-harness `perf-units` skill.
